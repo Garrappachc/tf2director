@@ -35,6 +35,9 @@ class Tf2Server(object):
                 content = f.read()
             return content.strip()
 
+    def _get_log_file_path(self):
+        return os.path.join(self.path, self.name.join('.log'))
+
     def is_running(self):
         """
         Checks whether the server is running or not.
@@ -46,14 +49,22 @@ class Tf2Server(object):
 
         return self.tmux_server.has_session(session_name)
 
-    def start(self):
+    def start(self, ip, port=27015, map='cp_badlands', server_cfg_file='server.cfg'):
         """
         Starts the server, if it is not yet running.
         """
         if self.is_running():
             print('Server already running')
         else:
+            session = self.tmux_server.new_session(self._get_tmux_session_name())
+            pane = session.attached_pane
+
             srcds_location = os.path.join(self.path, 'srcds_run')
-            exec = '{0} -game tf -ip {1} -port {2} +map {3} +maxplayers 24 -secured -timeout 0 +servercfgfile {4}'\
-                .format(srcds_location, '127.0.0.1', '27015', 'cp_badlands', 'server.cfg')
+            exec = '{0} -game tf -ip {1} -port {2} +map {3} +maxplayers 24 -secured -timeout 0 +servercfgfile {4}' \
+                .format(srcds_location, ip, port, map, server_cfg_file)
             print(exec)
+            pane.send_keys(exec)
+
+    def stop(self):
+        if self.is_running():
+            self.tmux_server.kill_session(self._get_tmux_session_name())

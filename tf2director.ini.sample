@@ -1,0 +1,29 @@
+#
+# Sample config file for tf2director
+# Rename it to tf2director.ini, modify values according to your needs and move
+# it to home directory.
+#
+
+[default]
+
+# IP to bind all servers to (-ip srcds argument)
+ip = 127.0.0.1
+
+# The +maxplayers srcds argument
+maxplayers = 24
+
+# The server config file
+server_config = server.cfg
+
+
+[my_first_server]
+
+# Where is the server located; path to the directory that contains the "tf" directory
+path = ~/tf2servers/my_first_server
+
+# Port on which the server will run
+port = 27015
+
+# The +map srcds argument
+initial_map = cp_badlands
+

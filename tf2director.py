@@ -65,7 +65,7 @@ def main():
     elif args.action == 'restart':
         ip = config[args.server]['ip']
         port = config[args.server]['port']
-        initial = config[args.parser]['initial_map']
+        initial = config[args.server]['initial_map']
         cfg_file = config[args.server]['server_config']
 
         server.stop()

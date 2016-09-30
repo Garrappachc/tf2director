@@ -4,16 +4,22 @@
 # it to home directory.
 #
 
-[default]
+[DEFAULT]
 
 # IP to bind all servers to (-ip srcds argument)
 ip = 127.0.0.1
+
+# Port for the server to bind to (-port srcds argument)
+port = 27015
 
 # The +maxplayers srcds argument
 maxplayers = 24
 
 # The server config file
 server_config = server.cfg
+
+# Initial map
+initial_map = cp_badlands
 
 
 [my_first_server]

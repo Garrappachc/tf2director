@@ -52,12 +52,13 @@ def main():
     server = Tf2Server(server_name, server_path)
 
     if args.action == 'start':
-        ip = config['default']['ip']
-        port = config[args.server]['port'] if 'port' in config[args.server] else 27015
-        map = config[args.server]['initial_map'] if 'initial_map' in config[args.server] else 'cp_badlands'
-        cfg_file = config[args.server]['server_config'] if 'server_config' in config[args.server] else 'server.cfg'
+        ip = config[args.server]['ip']
+        port = config[args.server]['port']
+        initial_map = config[args.server]['initial_map']
+        cfg_file = config[args.server]['server_config']
 
-        server.start(ip, port, map, cfg_file)
+        server.start(ip, port, initial_map, cfg_file)
+
     elif args.action == 'stop':
         server.stop()
 

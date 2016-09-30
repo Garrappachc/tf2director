@@ -84,16 +84,21 @@ class Tf2Server(object):
             print(command)
             pane.send_keys(command)
 
-    def stop(self):
+    def stop(self, delay=10):
+        """
+        Show in-game notification, wait for the specified delay period and quit the server.
+        :param delay: How long to wait before the server actually quits.
+        """
         if self.is_running():
-            msg = 'Server shutting down in 10 seconds!'
+            msg = 'Server shutting down in {0} seconds!'.format(delay)
             print(msg)
             if self._has_sourcemod():
                 self.command('sm_csay "{0}"'.format(msg))
             self.command('say "{0}"'.format(msg))
 
-            time.sleep(10)
+            time.sleep(delay)
             self.command('quit')
             time.sleep(5)
 
             self.tmux_server.kill_session(self._get_tmux_session_name())
+

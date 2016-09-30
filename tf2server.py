@@ -30,7 +30,7 @@ class Tf2Server(object):
     def _get_tmux_session_name(self):
         file_name = os.path.join(self.path, '.tmux-session')
         if not os.path.isfile(file_name):
-            return self.name
+            return 'tf2server_{0}_console'.format(self.name)
         else:
             with open(file_name, 'r') as f:
                 content = f.read()

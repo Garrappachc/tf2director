@@ -102,3 +102,6 @@ class Tf2Server(object):
 
             self.tmux_server.kill_session(self._get_tmux_session_name())
 
+        else:
+            print('Server not running')
+

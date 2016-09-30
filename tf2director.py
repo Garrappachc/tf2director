@@ -31,7 +31,7 @@ def main():
 
     parser = ArgumentParser(description=description)
     parser.add_argument('server', help='server to be used', metavar='server')
-    parser.add_argument('action', choices=['start', 'stop'], help='action to do', metavar='action')
+    parser.add_argument('action', choices=['start', 'stop', 'restart'], help='action to do', metavar='action')
 
     args = parser.parse_args()
 
@@ -61,6 +61,16 @@ def main():
 
     elif args.action == 'stop':
         server.stop()
+
+    elif args.action == 'restart':
+        ip = config[args.server]['ip']
+        port = config[args.server]['port']
+        initial = config[args.parser]['initial_map']
+        cfg_file = config[args.server]['server_config']
+
+        server.stop()
+        server.start(ip, port, initial_map, cfg_file)
+
 
 if __name__ == '__main__':
     main()

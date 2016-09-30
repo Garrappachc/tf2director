@@ -1,4 +1,5 @@
 import os
+import time
 import libtmux
 
 
@@ -15,7 +16,7 @@ class Tf2Server(object):
 
     def __init__(self, name, path):
         """
-        Creates the Tf2Server class instance that uses the given path.
+        Create the Tf2Server class instance that uses the given path.
         :param name: The TF2 server instance name.
         :param path: The absolute path to where the TF2 server is located.
         """
@@ -38,9 +39,27 @@ class Tf2Server(object):
     def _get_log_file_path(self):
         return os.path.join(self.path, self.name.join('.log'))
 
+    def _has_sourcemod(self):
+        path = os.path.join(self.path, 'tf/addons/sourcemod/plugins/basechat.smx')
+        return os.path.isfile(path)
+
+    def command(self, command):
+        """
+        Execute a command on the running TF2 server instance.
+        :param command: str
+        """
+        if not self.is_running():
+            return
+
+        session = self.tmux_server.find_where({'session_name': self._get_tmux_session_name()})
+        pane = session.attached_pane
+
+        print(command)
+        pane.send_keys(command)
+
     def is_running(self):
         """
-        Checks whether the server is running or not.
+        Check whether the server is running or not.
         :return: True if the instance is running, False otherwise.
         """
         session_name = self._get_tmux_session_name()
@@ -60,11 +79,21 @@ class Tf2Server(object):
             pane = session.attached_pane
 
             srcds_location = os.path.join(self.path, 'srcds_run')
-            exec = '{0} -game tf -ip {1} -port {2} +map {3} +maxplayers 24 -secured -timeout 0 +servercfgfile {4}' \
+            command = '{0} -game tf -ip {1} -port {2} +map {3} +maxplayers 24 -secured -timeout 0 +servercfgfile {4}' \
                 .format(srcds_location, ip, port, map, server_cfg_file)
-            print(exec)
-            pane.send_keys(exec)
+            print(command)
+            pane.send_keys(command)
 
     def stop(self):
         if self.is_running():
+            msg = 'Server shutting down in 10 seconds!'
+            print(msg)
+            if self._has_sourcemod():
+                self.command('sm_csay "{0}"'.format(msg))
+            self.command('say "{0}"'.format(msg))
+
+            time.sleep(10)
+            self.command('quit')
+            time.sleep(5)
+
             self.tmux_server.kill_session(self._get_tmux_session_name())

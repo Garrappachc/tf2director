@@ -27,7 +27,8 @@ class Tf2Server(object):
         if not os.path.isdir(os.path.join(path, 'tf')):
             raise CorruptedTf2ServerInstanceError()
 
-    def _get_tmux_session_name(self):
+    @property
+    def tmux_session_name(self):
         file_name = os.path.join(self.path, '.tmux-session')
         if not os.path.isfile(file_name):
             return 'tf2server_{0}_console'.format(self.name)
@@ -36,7 +37,8 @@ class Tf2Server(object):
                 content = f.read()
             return content.strip()
 
-    def _get_log_file_path(self):
+    @property
+    def log_file_path(self):
         return os.path.join(self.path, self.name.join('.log'))
 
     def _has_sourcemod(self):
@@ -51,7 +53,7 @@ class Tf2Server(object):
         if not self.is_running():
             return
 
-        session = self.tmux_server.find_where({'session_name': self._get_tmux_session_name()})
+        session = self.tmux_server.find_where({'session_name': self.tmux_session_name})
         pane = session.attached_pane
 
         print(command)
@@ -62,11 +64,10 @@ class Tf2Server(object):
         Check whether the server is running or not.
         :return: True if the instance is running, False otherwise.
         """
-        session_name = self._get_tmux_session_name()
         if not self.tmux_server:
             self.tmux_server = libtmux.Server()
 
-        return self.tmux_server.has_session(session_name)
+        return self.tmux_server.has_session(self.tmux_session_name)
 
     def start(self, ip, port=27015, map='cp_badlands', server_cfg_file='server.cfg'):
         """
@@ -75,8 +76,10 @@ class Tf2Server(object):
         if self.is_running():
             print('Server already running')
         else:
-            session = self.tmux_server.new_session(self._get_tmux_session_name())
+            session = self.tmux_server.new_session(self.tmux_session_name)
             pane = session.attached_pane
+
+            pane.cmd('-o', '/usr/bin/cat >> {0}'.format(self.log_file_path))
 
             srcds_location = os.path.join(self.path, 'srcds_run')
             command = '{0} -game tf -ip {1} -port {2} +map {3} +maxplayers 24 -secured -timeout 0 +servercfgfile {4}' \
@@ -100,7 +103,7 @@ class Tf2Server(object):
             self.command('quit')
             time.sleep(5)
 
-            self.tmux_server.kill_session(self._get_tmux_session_name())
+            self.tmux_server.kill_session(self.tmux_session_name)
 
         else:
             print('Server not running')

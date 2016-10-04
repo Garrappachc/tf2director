@@ -1,3 +1,4 @@
+import datetime
 import os
 import time
 import libtmux
@@ -69,6 +70,17 @@ class Tf2Server(object):
 
         return self.tmux_server.has_session(self.tmux_session_name)
 
+    def _rotate_logs(self):
+        """
+        Renames log file to something that contains date and time.
+        """
+        file_name = self.log_file_path
+        if os.path.isfile(file_name):
+            now = datetime.datetime.now()
+            log_file_name = file_name + now.strftime('%Y%m%d%H%M%S')
+            print('Saving {0} as {1}'.format(file_name, log_file_name))
+            os.rename(file_name, log_file_name)
+
     def start(self, ip, port=27015, map='cp_badlands', server_cfg_file='server.cfg'):
         """
         Start the server, if it is not yet running.
@@ -76,6 +88,8 @@ class Tf2Server(object):
         if self.is_running():
             print('Server already running')
         else:
+            self._rotate_logs()
+
             session = self.tmux_server.new_session(self.tmux_session_name)
             pane = session.attached_pane
 
@@ -105,6 +119,7 @@ class Tf2Server(object):
             time.sleep(5)
 
             self.tmux_server.kill_session(self.tmux_session_name)
+            self._rotate_logs()
 
         else:
             print('Server not running')

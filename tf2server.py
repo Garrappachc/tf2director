@@ -44,7 +44,7 @@ class Tf2Server(object):
         if not os.path.isdir(logs_directory):
             os.mkdir(logs_directory)
 
-        return os.path.join(logs_directory, self.name + '.log')
+        return os.path.join(logs_directory, self.name + '-console.log')
 
     def _has_sourcemod(self):
         path = os.path.join(self.path, 'tf/addons/sourcemod/plugins/basechat.smx')

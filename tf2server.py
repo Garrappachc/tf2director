@@ -3,6 +3,8 @@ import os
 import time
 import libtmux
 
+from subprocess import call
+
 
 class CorruptedTf2ServerInstanceError(Exception):
     """
@@ -128,3 +130,25 @@ class Tf2Server(object):
         else:
             print('Server not running')
 
+    def has_update(self):
+        """
+        Check for available updates.
+        :return: True if the server needs to be updated, False otherwise.
+        """
+        # if there is the 'MasterRequestRestart' in the console, the update is here
+        with open(self.log_file_path, 'r') as file:
+            for line in file:
+                if 'MasterRequestRestart' in line:
+                    return True
+
+        return False
+
+    def update(self):
+        """
+        Update the server instance.
+        """
+        if self.is_running():
+            print('Cannot issue update on a running server')
+        else:
+            call(['/usr/bin/steamcmd', '+login', 'anonymous', '+force_install_dir', self.path, '+app_update', '232250',
+                  '+quit'])

@@ -31,7 +31,7 @@ def main():
 
     parser = ArgumentParser(description=description)
     parser.add_argument('server', help='server to be used', metavar='server')
-    parser.add_argument('action', choices=['start', 'stop', 'restart'], help='action to do', metavar='action')
+    parser.add_argument('action', choices=['start', 'stop', 'restart', 'update'], help='action to do', metavar='action')
 
     args = parser.parse_args()
 
@@ -51,25 +51,28 @@ def main():
     server_path = os.path.expanduser(config[args.server]['path'])
     server = Tf2Server(server_name, server_path)
 
-    if args.action == 'start':
-        ip = config[args.server]['ip']
-        port = config[args.server]['port']
-        initial_map = config[args.server]['initial_map']
-        cfg_file = config[args.server]['server_config']
+    ip = config[args.server]['ip']
+    port = config[args.server]['port']
+    initial_map = config[args.server]['initial_map']
+    cfg_file = config[args.server]['server_config']
 
+    if args.action == 'start':
         server.start(ip, port, initial_map, cfg_file)
 
     elif args.action == 'stop':
         server.stop()
 
     elif args.action == 'restart':
-        ip = config[args.server]['ip']
-        port = config[args.server]['port']
-        initial_map = config[args.server]['initial_map']
-        cfg_file = config[args.server]['server_config']
-
         server.stop()
         server.start(ip, port, initial_map, cfg_file)
+
+    elif args.action == 'update':
+        if server.has_update():
+            server.stop()
+            server.update()
+            server.start(ip, port, initial_map, cfg_file)
+        else:
+            print('Update not needed')
 
 
 if __name__ == '__main__':

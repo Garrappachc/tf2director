@@ -39,7 +39,7 @@ class Tf2Server(object):
 
     @property
     def log_file_path(self):
-        return os.path.join(self.path, self.name.join('.log'))
+        return os.path.join(self.path, self.name + '.log')
 
     def _has_sourcemod(self):
         path = os.path.join(self.path, 'tf/addons/sourcemod/plugins/basechat.smx')
@@ -71,7 +71,7 @@ class Tf2Server(object):
 
     def start(self, ip, port=27015, map='cp_badlands', server_cfg_file='server.cfg'):
         """
-        Starts the server, if it is not yet running.
+        Start the server, if it is not yet running.
         """
         if self.is_running():
             print('Server already running')
@@ -79,7 +79,8 @@ class Tf2Server(object):
             session = self.tmux_server.new_session(self.tmux_session_name)
             pane = session.attached_pane
 
-            pane.cmd('-o', '/usr/bin/cat >> {0}'.format(self.log_file_path))
+            # copies stdout to the log file
+            pane.cmd('pipe-pane', '-o', '/usr/bin/cat >> {0}'.format(self.log_file_path))
 
             srcds_location = os.path.join(self.path, 'srcds_run')
             command = '{0} -game tf -ip {1} -port {2} +map {3} +maxplayers 24 -secured -timeout 0 +servercfgfile {4}' \

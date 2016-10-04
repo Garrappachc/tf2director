@@ -40,7 +40,11 @@ class Tf2Server(object):
 
     @property
     def log_file_path(self):
-        return os.path.join(self.path, self.name + '.log')
+        logs_directory = os.path.join(self.path, 'logs')
+        if not os.path.isdir(logs_directory):
+            os.mkdir(logs_directory)
+
+        return os.path.join(logs_directory, self.name + '.log')
 
     def _has_sourcemod(self):
         path = os.path.join(self.path, 'tf/addons/sourcemod/plugins/basechat.smx')
@@ -77,7 +81,7 @@ class Tf2Server(object):
         file_name = self.log_file_path
         if os.path.isfile(file_name):
             now = datetime.datetime.now()
-            log_file_name = file_name + now.strftime('%Y%m%d%H%M%S')
+            log_file_name = file_name + '.' + now.strftime('%Y%m%d%H%M%S')
             print('Saving {0} as {1}'.format(file_name, log_file_name))
             os.rename(file_name, log_file_name)
 

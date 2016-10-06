@@ -142,11 +142,16 @@ class Tf2Server(object):
         Check for available updates.
         :return: True if the server needs to be updated, False otherwise.
         """
+        file_path = self.log_file_path
+
         # if there is the 'MasterRequestRestart' in the console, the update is here
-        with open(self.log_file_path, 'r') as file:
-            for line in file:
-                if 'MasterRequestRestart' in line:
-                    return True
+        try:
+            with open(file_path, 'r') as file:
+                for line in file:
+                    if 'MasterRequestRestart' in line:
+                        return True
+        except FileNotFoundError:
+            pass
 
         return False
 

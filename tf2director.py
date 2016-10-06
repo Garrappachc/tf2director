@@ -56,23 +56,27 @@ def main():
     initial_map = config[args.server]['initial_map']
     cfg_file = config[args.server]['server_config']
 
-    if args.action == 'start':
-        server.start(ip, port, initial_map, cfg_file)
-
-    elif args.action == 'stop':
-        server.stop()
-
-    elif args.action == 'restart':
-        server.stop()
-        server.start(ip, port, initial_map, cfg_file)
-
-    elif args.action == 'update':
-        if server.has_update():
-            server.stop()
-            server.update()
+    try:
+        if args.action == 'start':
             server.start(ip, port, initial_map, cfg_file)
-        else:
-            print('Update not needed')
+
+        elif args.action == 'stop':
+            server.stop()
+
+        elif args.action == 'restart':
+            server.stop()
+            server.start(ip, port, initial_map, cfg_file)
+
+        elif args.action == 'update':
+            if server.has_update():
+                server.stop()
+                server.update()
+                server.start(ip, port, initial_map, cfg_file)
+            else:
+                print('Update not needed')
+
+    except ValueError as error:
+        print('{0}'.format(error))
 
 
 if __name__ == '__main__':

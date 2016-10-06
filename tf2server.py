@@ -41,6 +41,14 @@ class Tf2Server(object):
             return content.strip()
 
     @property
+    def tmux_session(self):
+        if not self.is_running():
+            raise ValueError('Server is not running')
+
+        session = self.tmux_server.find_where({'session_name': self.tmux_session_name})
+        return session
+
+    @property
     def log_file_path(self):
         logs_directory = os.path.join(self.path, 'logs')
         if not os.path.isdir(logs_directory):
@@ -60,7 +68,7 @@ class Tf2Server(object):
         if not self.is_running():
             return
 
-        session = self.tmux_server.find_where({'session_name': self.tmux_session_name})
+        session = self.tmux_session
         pane = session.attached_pane
 
         print(command)
@@ -92,7 +100,7 @@ class Tf2Server(object):
         Start the server, if it is not yet running.
         """
         if self.is_running():
-            print('Server already running')
+            raise ValueError('Server is already running')
         else:
             self._rotate_logs()
 
@@ -113,22 +121,21 @@ class Tf2Server(object):
         Show in-game notification, wait for the specified delay period and quit the server.
         :param delay: How long to wait before the server actually quits.
         """
-        if self.is_running():
-            msg = 'Server shutting down in {0} seconds!'.format(delay)
-            print(msg)
-            if self._has_sourcemod():
-                self.command('sm_csay "{0}"'.format(msg))
-            self.command('say "{0}"'.format(msg))
+        if not self.is_running():
+            raise ValueError('Server is not running')
 
-            time.sleep(delay)
-            self.command('quit')
-            time.sleep(5)
+        msg = 'Server shutting down in {0} seconds!'.format(delay)
+        print(msg)
+        if self._has_sourcemod():
+            self.command('sm_csay "{0}"'.format(msg))
+        self.command('say "{0}"'.format(msg))
 
-            self.tmux_server.kill_session(self.tmux_session_name)
-            self._rotate_logs()
+        time.sleep(delay)
+        self.command('quit')
+        time.sleep(5)
 
-        else:
-            print('Server not running')
+        self.tmux_server.kill_session(self.tmux_session_name)
+        self._rotate_logs()
 
     def has_update(self):
         """
@@ -148,7 +155,16 @@ class Tf2Server(object):
         Update the server instance.
         """
         if self.is_running():
-            print('Cannot issue update on a running server')
-        else:
-            call(['/usr/bin/steamcmd', '+login', 'anonymous', '+force_install_dir', self.path, '+app_update', '232250',
-                  '+quit'])
+            raise ValueError('Server is running')
+
+        call(['/usr/bin/steamcmd', '+login', 'anonymous', '+force_install_dir', self.path, '+app_update', '232250',
+              '+quit'])
+
+    def attach(self):
+        """
+        Attaches to the server's console. Press Ctrl+B and then D to detach from it.
+        """
+        if not self.is_running():
+            raise ValueError('Server is not running')
+
+        self.tmux_session.attach_session()

@@ -111,15 +111,15 @@ class Tf2Server(object):
             pane.cmd('pipe-pane', '-o', '/usr/bin/cat >> {0}'.format(self.log_file_path))
 
             srcds_location = os.path.join(self.path, 'srcds_run')
-            command = ('{0}'
-                       '-game tf'
-                       '-ip {1}'
-                       '-port {2}'
-                       '+map {3}'
-                       '+maxplayers 24'
-                       '-secured'
-                       '-timeout 0'
-                       '+servercfgfile {4}'
+            command = ('{0} '
+                       '-game tf '
+                       '-ip {1} '
+                       '-port {2} '
+                       '+map {3} '
+                       '+maxplayers 24 '
+                       '-secured '
+                       '-timeout 0 '
+                       '+servercfgfile {4} '
                        '{5}').format(srcds_location, ip, port, initial_map, server_cfg_file, more_args)
             print(command)
             pane.send_keys(command)

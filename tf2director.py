@@ -31,7 +31,8 @@ def main():
 
     parser = ArgumentParser(description=description)
     parser.add_argument('server', help='server to be used', metavar='server')
-    parser.add_argument('action', choices=['start', 'stop', 'restart', 'update'], help='action to do', metavar='action')
+    parser.add_argument('action', choices=['start', 'stop', 'restart', 'console', 'update'], help='action to do',
+                        metavar='action')
 
     args = parser.parse_args()
 
@@ -66,6 +67,9 @@ def main():
         elif args.action == 'restart':
             server.stop()
             server.start(ip, port, initial_map, cfg_file)
+
+        elif args.action == 'console':
+            server.attach()
 
         elif args.action == 'update':
             if server.has_update():

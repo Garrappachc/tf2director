@@ -56,17 +56,21 @@ def main():
     port = config[args.server]['port']
     initial_map = config[args.server]['initial_map']
     cfg_file = config[args.server]['server_config']
+    try:
+        more_args = config[args.server]['args']
+    except KeyError:
+        more_args = ''
 
     try:
         if args.action == 'start':
-            server.start(ip, port, initial_map, cfg_file)
+            server.start(ip, port, initial_map, cfg_file, more_args)
 
         elif args.action == 'stop':
             server.stop()
 
         elif args.action == 'restart':
             server.stop()
-            server.start(ip, port, initial_map, cfg_file)
+            server.start(ip, port, initial_map, cfg_file, more_args)
 
         elif args.action == 'console':
             server.attach()
@@ -75,7 +79,7 @@ def main():
             if server.has_update():
                 server.stop()
                 server.update()
-                server.start(ip, port, initial_map, cfg_file)
+                server.start(ip, port, initial_map, cfg_file, more_args)
             else:
                 print('Update not needed')
 

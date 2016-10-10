@@ -95,7 +95,7 @@ class Tf2Server(object):
             print('Saving {0} as {1}'.format(file_name, log_file_name))
             os.rename(file_name, log_file_name)
 
-    def start(self, ip, port=27015, map='cp_badlands', server_cfg_file='server.cfg'):
+    def start(self, ip, port=27015, initial_map='cp_badlands', server_cfg_file='server.cfg', more_args=''):
         """
         Start the server, if it is not yet running.
         """
@@ -111,8 +111,16 @@ class Tf2Server(object):
             pane.cmd('pipe-pane', '-o', '/usr/bin/cat >> {0}'.format(self.log_file_path))
 
             srcds_location = os.path.join(self.path, 'srcds_run')
-            command = '{0} -game tf -ip {1} -port {2} +map {3} +maxplayers 24 -secured -timeout 0 +servercfgfile {4}' \
-                .format(srcds_location, ip, port, map, server_cfg_file)
+            command = ('{0}'
+                       '-game tf'
+                       '-ip {1}'
+                       '-port {2}'
+                       '+map {3}'
+                       '+maxplayers 24'
+                       '-secured'
+                       '-timeout 0'
+                       '+servercfgfile {4}'
+                       '{5}').format(srcds_location, ip, port, initial_map, server_cfg_file, more_args)
             print(command)
             pane.send_keys(command)
 

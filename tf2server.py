@@ -12,6 +12,12 @@ class CorruptedTf2ServerInstanceError(Exception):
     """
 
 
+class SteamCmdNotFoundError(Exception):
+    """
+    Raised when the steamcmd executable could not be found in PATH.
+    """
+
+
 class Tf2Server(object):
     """
     The Tf2Server class represents a single Team Fortress 2 server.
@@ -29,6 +35,19 @@ class Tf2Server(object):
 
         if not os.path.isdir(os.path.join(path, 'tf')):
             raise CorruptedTf2ServerInstanceError()
+
+    def _find_steamcmd(self):
+        """
+        Finds steamcmd executable.
+        :return: The steamcmd executable absolute path.
+        """
+        name = 'steamcmd'
+        for p in os.environ['PATH'].split(':'):
+            path = os.path.join(p, name)
+            if os.path.isfile(path):
+                return path
+
+        raise SteamCmdNotFoundError()
 
     @property
     def tmux_session_name(self):
@@ -170,7 +189,8 @@ class Tf2Server(object):
         if self.is_running():
             raise ValueError('Server is running')
 
-        call(['/usr/bin/steamcmd', '+login', 'anonymous', '+force_install_dir', self.path, '+app_update', '232250',
+        steamcmd = self._find_steamcmd()
+        call([steamcmd, '+login', 'anonymous', '+force_install_dir', self.path, '+app_update', '232250',
               '+quit'])
 
     def attach(self):

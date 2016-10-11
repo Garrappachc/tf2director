@@ -42,7 +42,7 @@ def main():
     if args.server == 'all':
         for s in config.sections():
             c = config[s]
-            server = Tf2Server(s, os.path.expanduser(s['path']))
+            server = Tf2Server(s, os.path.expanduser(c['path']))
             server.ip = c['ip']
             server.port = c['port']
             server.initial_map = c['initial_map']

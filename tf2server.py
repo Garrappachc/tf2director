@@ -179,7 +179,7 @@ class Tf2Server(object):
 
         # if there is the 'MasterRequestRestart' in the console, the update is here
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:
                 for line in file:
                     if 'MasterRequestRestart' in line:
                         return True

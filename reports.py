@@ -12,7 +12,7 @@ def try_update(server):
     status = 'not running'
     if server.is_running():
         if server.has_update():
-            status = 'HAS UPDATE!'
+            status = 'HAS UPDATE'
         else:
             status = 'no update'
 

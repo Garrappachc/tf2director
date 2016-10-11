@@ -33,7 +33,8 @@ def main():
 
     if 'all' in config:
         raise ValueError('A server cannot be named \'all\'!')
-    elif args.server not in config:
+
+    if args.server not in config and args.server != 'all':
         raise ValueError('Server \'{0}\' is not configured'.format(args.server))
 
     servers = []

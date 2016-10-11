@@ -5,22 +5,8 @@ import sys
 from argparse import ArgumentParser
 from configparser import ConfigParser
 
+import actions
 from tf2server import Tf2Server
-
-
-class ServerConfigurationError(Exception):
-    """
-    Raised when user tries to used improperly configured TF2 server.
-    """
-    pass
-
-
-class ServerInvalidPathError(Exception):
-    """
-    This exception is raised if the specified server path is invalid (i.e. does not contain a valid TF2 server
-    installation or does not exist at all).
-    """
-    pass
 
 
 def main():
@@ -30,9 +16,9 @@ def main():
     description = 'tf2director is a script that helps managing multiple Team Fortress 2 server instances.'
 
     parser = ArgumentParser(description=description)
-    parser.add_argument('server', help='server to be used', metavar='server')
-    parser.add_argument('action', choices=['start', 'stop', 'restart', 'console', 'update'], help='action to do',
-                        metavar='action')
+    parser.add_argument('server', help='server to be used or "all"', metavar='server')
+    parser.add_argument('action', choices=['start', 'stop', 'restart', 'console', 'update', 'report'],
+                        help='action to do', metavar='action')
 
     args = parser.parse_args()
 
@@ -45,43 +31,54 @@ def main():
     config = ConfigParser()
     config.read(config_file)
 
-    if args.server not in config:
-        raise ServerConfigurationError()
+    if 'all' in config:
+        raise ValueError('A server cannot be named \'all\'!')
+    elif args.server not in config:
+        raise ValueError('Server \'{0}\' is not configured'.format(args.server))
 
-    server_name = args.server
-    server_path = os.path.expanduser(config[args.server]['path'])
-    server = Tf2Server(server_name, server_path)
+    servers = []
 
-    ip = config[args.server]['ip']
-    port = config[args.server]['port']
-    initial_map = config[args.server]['initial_map']
-    cfg_file = config[args.server]['server_config']
-    try:
-        more_args = config[args.server]['args']
-    except KeyError:
-        more_args = ''
+    if args.server == 'all':
+        for s in config.sections():
+            c = config[s]
+            server = Tf2Server(s, os.path.expanduser(s['path']))
+            server.ip = c['ip']
+            server.port = c['port']
+            server.initial_map = c['initial_map']
+            server.cfg_file = c['server_config']
+
+            servers.append(server)
+    else:
+        c = config[args.server]
+        path = c['path']
+        server = Tf2Server(args.server, os.path.expanduser(path))
+        server.ip = c['ip']
+        server.port = c['port']
+        server.initial_map = c['initial_map']
+        server.cfg_file = c['server_config']
+
+        servers.append(server)
 
     try:
         if args.action == 'start':
-            server.start(ip, port, initial_map, cfg_file, more_args)
+            actions.start(servers)
 
         elif args.action == 'stop':
-            server.stop()
+            actions.stop(servers)
 
         elif args.action == 'restart':
-            server.stop()
-            server.start(ip, port, initial_map, cfg_file, more_args)
+            actions.restart(servers)
 
         elif args.action == 'console':
-            server.attach()
+            if len(servers) == 1:
+                server = servers[0]
+                server.attach()
 
         elif args.action == 'update':
-            if server.has_update():
-                server.stop()
-                server.update()
-                server.start(ip, port, initial_map, cfg_file, more_args)
-            else:
-                print('Update not needed')
+            actions.update(servers)
+
+        elif args.action == 'report':
+            actions.report(servers)
 
     except ValueError as error:
         print('{0}'.format(error))

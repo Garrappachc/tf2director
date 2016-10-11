@@ -33,6 +33,12 @@ class Tf2Server(object):
         self.path = path
         self.tmux_server = None
 
+        # default values
+        self.ip = '0.0.0.0'
+        self.port = 27015
+        self.initial_map = 'cp_badlands'
+        self.cfg_file = 'server.cfg'
+
         if not os.path.isdir(os.path.join(path, 'tf')):
             raise CorruptedTf2ServerInstanceError()
 
@@ -114,7 +120,7 @@ class Tf2Server(object):
             print('Saving {0} as {1}'.format(file_name, log_file_name))
             os.rename(file_name, log_file_name)
 
-    def start(self, ip, port=27015, initial_map='cp_badlands', server_cfg_file='server.cfg', more_args=''):
+    def start(self):
         """
         Start the server, if it is not yet running.
         """
@@ -139,7 +145,7 @@ class Tf2Server(object):
                        '-secured '
                        '-timeout 0 '
                        '+servercfgfile {4} '
-                       '{5}').format(srcds_location, ip, port, initial_map, server_cfg_file, more_args)
+                       '{5}').format(srcds_location, self.ip, self.port, self.initial_map, self.cfg_file, '')
             print(command)
             pane.send_keys(command)
 

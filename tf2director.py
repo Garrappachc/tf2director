@@ -47,6 +47,7 @@ def main():
             server.port = c['port']
             server.initial_map = c['initial_map']
             server.cfg_file = c['server_config']
+            server.max_players = c['max_players']
 
             servers.append(server)
     else:
@@ -57,6 +58,7 @@ def main():
         server.port = c['port']
         server.initial_map = c['initial_map']
         server.cfg_file = c['server_config']
+        server.max_players = c['max_players']
 
         servers.append(server)
 

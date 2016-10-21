@@ -2,6 +2,7 @@ import datetime
 import os
 import time
 import libtmux
+from valve.source.a2s import ServerQuerier
 
 from subprocess import call
 
@@ -208,3 +209,18 @@ class Tf2Server(object):
             raise ValueError('Server is not running')
 
         self.tmux_session.attach_session()
+
+    def status(self):
+        """
+        Query server for status.
+        """
+        if self.ip == '0.0.0.0':
+            raise ValueError('No server IP address specified')
+
+        server = ServerQuerier((self.ip, self.port))
+        info = server.info()
+        players = server.players()
+
+        print('{server_name} {player_count}/{max_players}'.format(**info))
+        for player in sorted(players['players'], key=lambda p: p['score'], reverse=True):
+            print('{score} {name}'.format(**player))

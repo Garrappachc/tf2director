@@ -1,4 +1,3 @@
-import reports
 from tf2server import Tf2Server
 
 

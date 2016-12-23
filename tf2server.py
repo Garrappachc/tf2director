@@ -217,7 +217,7 @@ class Tf2Server(object):
         if self.ip == '0.0.0.0':
             raise ValueError('No server IP address specified')
 
-        server = ServerQuerier((self.ip, self.port))
+        server = ServerQuerier((self.ip, int(self.port)))
         try:
             info = server.info()
             players = server.players()

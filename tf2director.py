@@ -17,7 +17,7 @@ def main():
 
     parser = ArgumentParser(description=description)
     parser.add_argument('server', help='server to be used or "all"', metavar='server')
-    parser.add_argument('action', choices=['start', 'stop', 'restart', 'console', 'update', 'report'],
+    parser.add_argument('action', choices=['start', 'stop', 'restart', 'console', 'update', 'status'],
                         help='action to do', metavar='action')
 
     args = parser.parse_args()
@@ -80,8 +80,8 @@ def main():
         elif args.action == 'update':
             actions.update(servers)
 
-        elif args.action == 'report':
-            actions.report(servers)
+        elif args.action == 'status':
+            actions.status(servers)
 
     except ValueError as error:
         print('{0}'.format(error))

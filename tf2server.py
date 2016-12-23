@@ -210,7 +210,7 @@ class Tf2Server(object):
 
         self.tmux_session.attach_session()
 
-    def status(self):
+    def print_status(self):
         """
         Query server for status.
         """
@@ -218,9 +218,15 @@ class Tf2Server(object):
             raise ValueError('No server IP address specified')
 
         server = ServerQuerier((self.ip, self.port))
-        info = server.info()
-        players = server.players()
+        try:
+            info = server.info()
+            players = server.players()
+        except AttributeError:
+            info = server.get_info()
+            players = server.get_players()
 
         print('{server_name} {player_count}/{max_players}'.format(**info))
         for player in sorted(players['players'], key=lambda p: p['score'], reverse=True):
             print('{score} {name}'.format(**player))
+
+

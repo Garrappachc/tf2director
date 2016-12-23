@@ -58,14 +58,14 @@ def update(servers):
             s.update()
 
 
-def report(servers):
+def status(servers):
     """
-
-    :param servers:
+    Print server(s) status.
+    :param servers:  list of servers.
     :return:
     """
     for s in servers:
         if not isinstance(s, Tf2Server):
             raise TypeError('Not an instance of Tf2Server')
 
-        reports.try_update(s)
+        s.print_status()

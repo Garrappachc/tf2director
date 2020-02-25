@@ -59,7 +59,7 @@ def main():
         server.initial_map = c['initial_map']
         server.cfg_file = c['server_config']
         server.max_players = c['max_players']
-        server.tv_port = c['tv_port'] if 'tv_port' in c else server.port + 5
+        server.tv_port = int(c['tv_port']) if 'tv_port' in c else server.port + 5
 
         servers.append(server)
 

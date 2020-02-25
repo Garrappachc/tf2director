@@ -40,6 +40,7 @@ class Tf2Server(object):
         self.initial_map = 'cp_badlands'
         self.cfg_file = 'server.cfg'
         self.max_players = 24
+        self.tv_port = self.port + 5
 
         if not os.path.isdir(os.path.join(path, 'tf')):
             raise CorruptedTf2ServerInstanceError()
@@ -147,7 +148,8 @@ class Tf2Server(object):
                        '-secured '
                        '-timeout 0 '
                        '+servercfgfile {5} '
-                       '{6}').format(srcds_location, self.ip, self.port, self.initial_map, self.max_players, self.cfg_file, '')
+                       '+tv_port {6} '
+                       '{7}').format(srcds_location, self.ip, self.port, self.initial_map, self.max_players, self.cfg_file, self.tv_port, '')
             print(command)
             pane.send_keys(command)
 
